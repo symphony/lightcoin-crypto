@@ -26,7 +26,7 @@ class Transaction {
   }
 
   commit = () => {
-    if (!this.allowed) return console.log(`Insufficient funds. Balance: ${this.account.balance}`);
+    if (!this.allowed) return console.log(`Insufficient funds - Balance: $${this.account.balance}`);
     this.account.balance = this.value;
     this.account.addTransaction(this);
     this.printTransaction();
@@ -61,4 +61,5 @@ const myAccount = new Account("00001");
 
 t1 = new Deposit(50.25, myAccount);
 t2 = new Deposit(14.99, myAccount);
-t3 = new Withdrawal(21.00, myAccount);
+t3 = new Withdrawal(231.00, myAccount);
+t4 = new Withdrawal(11.01, myAccount);
