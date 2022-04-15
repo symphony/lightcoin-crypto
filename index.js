@@ -6,9 +6,13 @@ class Account {
     this.transactions = [];
   }
 
-  get balance() {return this._balance;}
-  set balance(amount) {this._balance += amount;}
-  addTransaction = (transaction) => this.transactions.push(transaction);
+  get balance () {
+    const round = number => Number(Math.round(number+'e'+2)+'e-'+2);
+    return round(this._balance)
+  }
+  set balance (amount) {this._balance += amount}
+
+  addTransaction = transaction => this.transactions.push(transaction);
 
 }
 
@@ -17,36 +21,44 @@ class Transaction {
   constructor(amount, account) {
     this.amount = amount;
     this.account = account;
-    this.commit();
-    this.account.addTransaction(this);
+    this.transactionTime = Date(10);
+    this.commit(); // << commit self
   }
 
-  commit = () => this.account.balance = this.value;
+  commit = () => {
+    if (!this.allowed) return console.log(`Insufficient funds. Balance: ${this.account.balance}`);
+    this.account.balance = this.value;
+    this.account.addTransaction(this);
+    this.printTransaction();
+  }
+
+  printTransaction = () => {
+    const type = this.constructor.name;
+    const report = `${type} of $${this.amount} ${type === 'Deposit' ? "to" : "from"} account_${this.account.username} - Total Account Balance: $${this.account.balance}`;
+    console.log(report);
+  }
 
 }
 
 class Deposit extends Transaction {
 
+  get allowed () {return true;}
   get value () {return this.amount;}
 
 }
 
 class Withdrawal extends Transaction {
 
+  get allowed () {return this.amount < this.account.balance;}
   get value () {return -this.amount;}
 
 }
+// == end class definitions ==
 
 
-
-// DRIVER CODE BELOW
-// We use the code below to "drive" the application logic above and make sure it's working as expected
-const myAccount = new Account("myAccount");
+// == driver code ==
+const myAccount = new Account("00001");
 
 t1 = new Deposit(50.25, myAccount);
 t2 = new Deposit(14.99, myAccount);
 t3 = new Withdrawal(21.00, myAccount);
-
-console.log("Account balance:", myAccount.balance);
-console.log("account transactions", myAccount.transactions);
-// console.log("transaction 1", t1);
